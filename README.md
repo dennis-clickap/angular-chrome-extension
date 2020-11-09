@@ -16,6 +16,31 @@ If a browser action has a popup, the popup appears when the user clicks the icon
 
 Spoiler: this is where we use Angular
 
+## The Background Script
+
+To remind you, background script is:
+the extension’s event handler; it contains listeners for browser events that are important to the extension.
+
+In our case we would like to listen to web navigation completed event, do the URL matching and enable the extension if there is a match.
+1. Install the types for Chrome API: `npm i -D @types/chrome`
+2. Add `chrome` to `types` entry in `tsconfig.app.json` like below:
+```javascript
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": ["chrome"]
+  },
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts",
+    "src/background.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
+}
+```
 
 
 # AngularChromeExtension
