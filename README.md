@@ -1,5 +1,7 @@
 # Chrome extension with Angular — from zero to a little hero
 
+[](https://medium.com/angular-in-depth/chrome-extension-with-angular-why-and-how-778200b87575)
+
 ## Background script
 
 The background script is the extension’s event handler; it contains listeners for browser events that are important to the extension. It lies dormant until an event is fired then performs the instructed logic. An effective background script is only loaded when it is needed and unloaded when it goes idle.
@@ -43,4 +45,4 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
-# angular-chrome-extension
+# [angular-chrome-extension](https://medium.com/angular-in-depth/chrome-extension-with-angular-why-and-how-778200b87575)
