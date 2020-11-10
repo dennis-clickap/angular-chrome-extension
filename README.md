@@ -1,6 +1,6 @@
 # Chrome extension with Angular — from zero to a little hero
 
-[](https://medium.com/angular-in-depth/chrome-extension-with-angular-why-and-how-778200b87575)
+[Article - Chrome extension with Angular](https://medium.com/angular-in-depth/chrome-extension-with-angular-why-and-how-778200b87575)
 
 ## Background script
 
@@ -24,7 +24,7 @@ the extension’s event handler; it contains listeners for browser events that a
 In our case we would like to listen to web navigation completed event, do the URL matching and enable the extension if there is a match.
 1. Install the types for Chrome API: `npm i -D @types/chrome`
 2. Add `chrome` to `types` entry in `tsconfig.app.json` like below:
-```javascript
+```json
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
@@ -41,7 +41,86 @@ In our case we would like to listen to web navigation completed event, do the UR
   ]
 }
 ```
+## Compiling background script as part of Angular build
+Since the background scripts run in a context different than the extension’s popup we cannot just add it to the scripts section in angular.json .
+Anything that’s in scripts section is compiled by Angular CLI into scripts chunk and loaded by index.html (a popup context in our case).
+This is also the reason we can’t just import the background script in main.ts or any other file that is compiled as part of popup build.
+What we can do is creating another entry for background script in Webpack build that Angular CLI runs behind the scenes.
+For that purpose we’ll use Custom Webpack Builder:
+1. Install it: `npm i -D @angular-builders/custom-webpack`
+2. Update angular.json :
+```json
+"projects": {
+  "angular-chrome-extension": {
+    ...
+    "architect": {
+      "build": {
+        "builder": "@angular-builders/custom-webpack:browser",
+        "options": {
+          "customWebpackConfig": {
+            "path": "./custom-webpack.config.js"
+          }
+          ...
+        },
+        ...
+```
+3. In the root of your workspace create a file called custom-webpack.config.js with the following content: 
+```javascript
+module.exports = {
+    entry: { background: 'src/background.ts' },
+}
+```
+4. Run ng build .
 
+
+## Background page live reload
+
+Currently the background script behaves much like the manifest — it is reloaded only when you reload the extension.
+It is very annoying to go to Extensions page and press Reload button every time you change a name of a variable in the background script.
+
+So what can be done here? Since we’ve already incorporated Custom Webpack Builder in our build chain we can benefit from it a bit more.
+
+There is a [webpack-extension-reloader](https://www.npmjs.com/package/webpack-extension-reloader) plugin that does exactly what we want. It augments background script code with code that listens to the changes of the chunks and when there was a change in the background chunk it tells Chrome to reload the extension.
+1. Install extension reloader plugin: `npm i -D webpack-extension-reloader`
+2. Create a file named `custom-webpack-dev.config.js` in the root of your workspace:
+```javascript
+const ExtensionReloader = require('webpack-extension-reloader')
+const config = require('./custom-webpack.config');
+
+module.exports = {...config, 
+    mode: 'development',
+    plugins: [new ExtensionReloader({
+        reloadPage: true,
+        entries: {
+            background: 'background'
+        }
+    })]
+}
+```
+3. Add dev configuration to angular.json :
+```json
+      ...
+      "architect": {
+        "build": {
+          ...
+          "configurations": {
+            "dev": {
+              "customWebpackConfig": {
+                "path": "./custom-webpack-dev.config.js"
+              }
+            },
+            "production": {
+          ...
+```
+
+Let’s make sure it works:
+1. Run the build with this config: `ng build --watch --configuration=dev`
+2. Reload the extension (the old background script still lacks the live reload code, so you have to do it one last time)
+3. Navigate to http://google.com
+4. See page action enabled
+5. Go to background.ts and change the URL match pattern to blahblah
+6. Navigate to http://google.com
+7. See page action disabled
 
 # AngularChromeExtension
 
