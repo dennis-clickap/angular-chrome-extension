@@ -11,6 +11,7 @@ export class AppComponent implements OnInit {
   constructor() { }
 
   public colorize() {
+debugger;
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       chrome.tabs.executeScript(
         tabs[0].id,
@@ -27,7 +28,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     chrome.storage.sync.get('color', ({ color }) => {
       this.color = color;
-      console.log(this.color);
+      alert(this.color);
     });
   }
 
