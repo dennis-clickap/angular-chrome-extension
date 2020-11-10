@@ -122,6 +122,60 @@ Let’s make sure it works:
 6. Navigate to http://google.com
 7. See page action disabled
 
+## Adding color picker
+
+This will be an easy one. We will use ngx-color-picker component.
+Install ngx-color-picker: npm i ngx-color-picker
+Add ColorPickerModule to imports in app.module.ts:
+```javascript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { ColorPickerModule } from 'ngx-color-picker';
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    ColorPickerModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+3. Add color property to app.component.ts :
+```javascript
+export class AppComponent {
+  color: string;
+  constructor() { }
+}
+```
+
+4. Replace default Angular content with color picker in app.component.html :
+```html
+<span [style.color]="color" 
+  [cpToggle]="true" 
+  [cpDialogDisplay]="'inline'" 
+  [cpPositionRelativeToArrow]="true"
+  [(colorPicker)]="color" 
+  [cpOKButtonText]="'Apply'" 
+  [cpOKButton]="true">
+</span>
+```
+Refer to the color picker README for detailed API description
+
+5. If you don’t want the white frame around the color picker remove the margins from body in styles.scss:
+```css
+body {
+    margin: 0;
+}
+```
+
 # AngularChromeExtension
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.6.
